@@ -13,8 +13,8 @@ else
 
 cat > ${PGDATA}/recovery.conf <<EOF
 standby_mode = on
-primary_conninfo = 'host=${REPLICATE_FROM} port=5432 user=${POSTGRES_USER} password=${POSTGRES_PASSWORD}'
-primary_slot_name = 'replica_2_slot' # Name of the replication slot we created on the master
+primary_conninfo = 'host=${REPLICATE_FROM} port=5432 user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} application_name=r1'
+primary_slot_name = 'replica_1_slot' # Name of the replication slot we created on the master
 trigger_file = '/tmp/touch_me_to_promote_to_me_master'
 EOF
 chown postgres ${PGDATA}/recovery.conf
