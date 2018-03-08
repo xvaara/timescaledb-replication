@@ -2,6 +2,12 @@
 
 Idea from https://github.com/DanielDent/docker-postgres-replication
 
+Using this image
+  * `git clone https://github.com/xvaara/timescaledb-replication.git`
+  * `cd timescaledb-replication`
+  * `docker build -t "timescale-rep" --no-cache .`
+  * `docker run -it --name replicant-timescaledb -p 5432:5432 -e REPLICATE_FROM=rephost -e POSTGRES_USER=repuser -e POSTGRES_PASSWORD=reppassword timescale-rep:latest`
+
 Master/Slave Postgres Replication in 30 seconds.
 
   * Quickstart: `docker-compose up`
