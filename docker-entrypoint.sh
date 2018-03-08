@@ -81,19 +81,19 @@ if [ "$1" = 'postgres' ]; then
 			pass=
 			authMethod=trust
 		fi
+		file_env 'POSTGRES_INITDB_ARGS'
+		if [ "$POSTGRES_INITDB_WALDIR" ]; then
+			export POSTGRES_INITDB_ARGS="$POSTGRES_INITDB_ARGS --waldir $POSTGRES_INITDB_WALDIR"
+		fi
+		eval "initdb --username=postgres $POSTGRES_INITDB_ARGS"
+
+
+		{
+			echo
+			echo "host all all all $authMethod"
+		} >> "$PGDATA/pg_hba.conf"
 		if [ "x$REPLICATE_FROM" == "x" ]; then
 			
-			file_env 'POSTGRES_INITDB_ARGS'
-			if [ "$POSTGRES_INITDB_WALDIR" ]; then
-				export POSTGRES_INITDB_ARGS="$POSTGRES_INITDB_ARGS --waldir $POSTGRES_INITDB_WALDIR"
-			fi
-			eval "initdb --username=postgres $POSTGRES_INITDB_ARGS"
-
-
-			{
-				echo
-				echo "host all all all $authMethod"
-			} >> "$PGDATA/pg_hba.conf"
 
 			# internal start of server in order to allow set-up using psql-client
 			# does not listen on external TCP/IP and waits until start finishes
@@ -130,6 +130,9 @@ if [ "$1" = 'postgres' ]; then
 			# 	echo "Waiting for master to ping..."
 			# 	sleep 1s
 			# done
+			mkdir ~/tmp
+			mv $PGDATA/*.conf ~/tmp
+			rm -rf $PGDATA/*
 			if [ "$POSTGRES_PASSWORD" ]; then
 				echo "*:*:*:*:$POSTGRES_PASSWORD" > ~/.pgpass
 				chmod 0600 ~/.pgpass
@@ -139,6 +142,8 @@ if [ "$1" = 'postgres' ]; then
 				echo "Waiting for master to connect..."
 				sleep 1s
 			done
+			mv ~/tmp/*.conf $PGDATA/
+			rm -rf ~/tmp
 		fi
 
 		psql+=( --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" )
